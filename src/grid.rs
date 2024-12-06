@@ -191,11 +191,12 @@ pub struct GridLineIter<'a, T> {
 }
 
 impl<'a, T> Iterator for GridLineIter<'a, T> {
-    type Item = &'a T;
+    type Item = (&'a T, Coord);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.grid.bounds_check(&self.coord) {
-            Some(&self.grid[self.coord.step_return(&self.stride)])
+            let coord = self.coord.step_return(&self.stride);
+            Some((&self.grid[coord], coord))
         } else {
             None
         }
