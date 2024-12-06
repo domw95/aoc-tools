@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Index};
+use std::ops::{Add, AddAssign, Index, IndexMut};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Coord {
@@ -83,6 +83,12 @@ impl<T> Index<Coord> for Grid<T> {
     }
 }
 
+impl<T> IndexMut<Coord> for Grid<T> {
+    fn index_mut(&mut self, index: Coord) -> &mut Self::Output {
+        &mut self.items[self.width * index.y as usize + index.x as usize]
+    }
+}
+
 impl<T> Grid<T> {
     pub fn from_iter(iter: &mut dyn Iterator<Item = T>, width: usize) -> Self {
         let items: Vec<T> = iter.collect();
@@ -124,9 +130,19 @@ impl<'a, T> Grid<T> {
             stride,
         }
     }
+
+    pub fn stride_iter_mut(&'a mut self, start: Coord, stride: Coord) -> GridLineIterMut<'a, T> {
+        GridLineIterMut {
+            grid: self,
+            coord: start,
+            stride,
+        }
+    }
+
     pub fn north_iter(&'a self, start: Coord) -> GridLineIter<'a, T> {
         self.stride_iter(start, Coord::new(0, -1))
     }
+
     pub fn east_iter(&'a self, start: Coord) -> GridLineIter<'a, T> {
         self.stride_iter(start, Coord::new(1, 0))
     }
@@ -182,6 +198,22 @@ impl<'a, T> Grid<T> {
             self.north_west_iter(start),
         ]
     }
+
+    pub fn north_iter_mut(&'a mut self, start: Coord) -> GridLineIterMut<'a, T> {
+        self.stride_iter_mut(start, Coord::new(0, -1))
+    }
+
+    pub fn east_iter_mut(&'a mut self, start: Coord) -> GridLineIterMut<'a, T> {
+        self.stride_iter_mut(start, Coord::new(1, 0))
+    }
+
+    pub fn south_iter_mut(&'a mut self, start: Coord) -> GridLineIterMut<'a, T> {
+        self.stride_iter_mut(start, Coord::new(0, 1))
+    }
+
+    pub fn west_iter_mut(&'a mut self, start: Coord) -> GridLineIterMut<'a, T> {
+        self.stride_iter_mut(start, Coord::new(-1, 0))
+    }
 }
 
 pub struct GridLineIter<'a, T> {
@@ -197,6 +229,26 @@ impl<'a, T> Iterator for GridLineIter<'a, T> {
         if self.grid.bounds_check(&self.coord) {
             let coord = self.coord.step_return(&self.stride);
             Some((&self.grid[coord], coord))
+        } else {
+            None
+        }
+    }
+}
+
+pub struct GridLineIterMut<'a, T> {
+    grid: &'a mut Grid<T>,
+    coord: Coord,
+    stride: Coord,
+}
+
+impl<'a, T> Iterator for GridLineIterMut<'a, T> {
+    type Item = (&'a mut T, Coord);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.grid.bounds_check(&self.coord) {
+            let coord = self.coord.step_return(&self.stride);
+            let ptr = (&mut self.grid[coord]) as *mut T;
+            unsafe { Some((&mut *ptr, coord)) }
         } else {
             None
         }
