@@ -135,6 +135,27 @@ impl<T> Grid<T> {
     }
 }
 
+impl<T: PartialEq + Copy> Grid<T> {
+    pub fn iter_filtered(
+        &self,
+        value: T,
+    ) -> std::iter::Map<
+        std::iter::Filter<
+            std::iter::Enumerate<std::iter::Copied<std::slice::Iter<'_, T>>>,
+            impl FnMut(&(usize, T)) -> bool,
+        >,
+        impl FnMut((usize, T)) -> (Coord, T),
+    > {
+        let width = self.width;
+        self.items
+            .iter()
+            .copied()
+            .enumerate()
+            .filter(move |(_, item)| *item == value)
+            .map(move |(i, item)| (Coord::new((i % width) as i32, (i / width) as i32), item))
+    }
+}
+
 impl<'a, T> Grid<T> {
     pub fn stride_iter(&'a self, start: Coord, stride: Coord) -> GridLineIter<'a, T> {
         GridLineIter {
@@ -276,6 +297,14 @@ mod test {
     fn grid_iter() {
         let grid = Grid::from_iter(&mut (0..100u32), 10);
         for (c, item) in grid.iter() {
+            println!("{c:?}, {item}");
+        }
+    }
+
+    #[test]
+    fn grid_iter_filtered() {
+        let grid = Grid::from_iter(&mut (0..100u32), 10);
+        for (c, item) in grid.iter_filtered(5) {
             println!("{c:?}, {item}");
         }
     }
