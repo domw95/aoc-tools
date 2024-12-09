@@ -126,6 +126,10 @@ impl<T> Grid<T> {
         coord.diags().map(|c| self.checked_index(&c))
     }
 
+    pub fn diags_unchecked(&self, coord: &Coord) -> [&T; 4] {
+        coord.diags().map(|c| self.index(c))
+    }
+
     pub fn checked_index(&self, coord: &Coord) -> Option<&T> {
         if self.bounds_check(coord) {
             Some(&self[*coord])
