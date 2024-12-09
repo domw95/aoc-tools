@@ -104,6 +104,19 @@ impl<T> Grid<T> {
         coord.x < self.width as i32 && coord.y < self.height as i32 && coord.x >= 0 && coord.y >= 0
     }
 
+    pub fn iter<'a>(
+        &'a self,
+    ) -> std::iter::Map<
+        std::iter::Enumerate<std::slice::Iter<'a, T>>,
+        impl FnMut((usize, &'a T)) -> (Coord, &T),
+    > {
+        let width = self.width;
+        self.items
+            .iter()
+            .enumerate()
+            .map(move |(i, item)| (Coord::new((i % width) as i32, (i / width) as i32), item))
+    }
+
     pub fn coord_iter(&self) -> std::iter::Map<std::ops::Range<usize>, impl FnMut(usize) -> Coord> {
         let width = self.width;
         (0..self.items.len()).map(move |i| Coord::new((i % width) as i32, (i / width) as i32))
@@ -251,6 +264,19 @@ impl<'a, T> Iterator for GridLineIterMut<'a, T> {
             unsafe { Some((&mut *ptr, coord)) }
         } else {
             None
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Grid;
+
+    #[test]
+    fn grid_iter() {
+        let grid = Grid::from_iter(&mut (0..100u32), 10);
+        for (c, item) in grid.iter() {
+            println!("{c:?}, {item}");
         }
     }
 }
