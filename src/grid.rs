@@ -11,6 +11,19 @@ impl Coord {
         Coord { x, y }
     }
 
+    pub fn north(&self) -> Coord {
+        Coord::new(self.x, self.y - 1)
+    }
+    pub fn east(&self) -> Coord {
+        Coord::new(self.x + 1, self.y)
+    }
+    pub fn south(&self) -> Coord {
+        Coord::new(self.x, self.y + 1)
+    }
+    pub fn west(&self) -> Coord {
+        Coord::new(self.x - 1, self.y)
+    }
+
     pub fn north_east(&self) -> Coord {
         Coord::new(self.x + 1, self.y - 1)
     }
@@ -25,6 +38,10 @@ impl Coord {
 
     pub fn south_west(&self) -> Coord {
         Coord::new(self.x - 1, self.y + 1)
+    }
+
+    pub fn orthogs(&self) -> [Coord; 4] {
+        [self.north(), self.east(), self.south(), self.west()]
     }
 
     pub fn diags(&self) -> [Coord; 4] {
@@ -120,6 +137,12 @@ impl<T> Grid<T> {
     pub fn coord_iter(&self) -> std::iter::Map<std::ops::Range<usize>, impl FnMut(usize) -> Coord> {
         let width = self.width;
         (0..self.items.len()).map(move |i| Coord::new((i % width) as i32, (i / width) as i32))
+    }
+
+    pub fn orthogs_coords(&self, coord: &Coord) -> [Option<(Coord, &T)>; 4] {
+        coord
+            .orthogs()
+            .map(|c| self.checked_index(&c).map(|item| (c, item)))
     }
 
     pub fn diags(&self, coord: &Coord) -> [Option<&T>; 4] {
