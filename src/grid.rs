@@ -106,6 +106,11 @@ impl<T> IndexMut<Coord> for Grid<T> {
     }
 }
 
+impl<T: Copy> Grid<T> {
+    pub fn new(item: T, width: usize, height: usize) -> Grid<T> {
+        Grid::from_iter(&mut (0..(width * height)).map(|_| item), width)
+    }
+}
 impl<T> Grid<T> {
     pub fn from_iter(iter: &mut dyn Iterator<Item = T>, width: usize) -> Self {
         let items: Vec<T> = iter.collect();
