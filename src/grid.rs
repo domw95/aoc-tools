@@ -1,4 +1,7 @@
-use std::ops::{Add, AddAssign, Index, IndexMut};
+use std::{
+    fmt::Display,
+    ops::{Add, AddAssign, Index, IndexMut},
+};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Coord {
@@ -109,6 +112,28 @@ impl<T> IndexMut<Coord> for Grid<T> {
 impl<T: Copy> Grid<T> {
     pub fn new(item: T, width: usize, height: usize) -> Grid<T> {
         Grid::from_iter(&mut (0..(width * height)).map(|_| item), width)
+    }
+}
+
+impl<T: Display> Grid<T> {
+    pub fn print(&self) {
+        for (c, i) in self.iter() {
+            print!("{i}");
+            if c.x == self.width as i32 - 1 {
+                println!();
+            }
+        }
+    }
+
+    pub fn print_with_commas(&self) {
+        for (c, i) in self.iter() {
+            print!("{i}");
+            if c.x == self.width as i32 - 1 {
+                println!();
+            } else {
+                print!(",");
+            }
+        }
     }
 }
 impl<T> Grid<T> {
