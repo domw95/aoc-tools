@@ -14,10 +14,12 @@ impl Coord {
         Coord { x, y }
     }
 
+    #[inline]
     pub fn rectilinear_distance(&self, other: &Self) -> i32 {
         (self - other).rectilinear_norm()
     }
 
+    #[inline]
     pub fn rectilinear_norm(&self) -> i32 {
         self.x.abs() + self.y.abs()
     }
@@ -98,7 +100,7 @@ impl Coord {
 
 impl Add for Coord {
     type Output = Coord;
-
+    #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         Coord {
             x: self.x + rhs.x,
@@ -110,6 +112,7 @@ impl Add for Coord {
 impl Add for &Coord {
     type Output = Coord;
 
+    #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         *self + *rhs
     }
@@ -124,7 +127,7 @@ impl AddAssign for Coord {
 
 impl Sub for &Coord {
     type Output = Coord;
-
+    #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         Coord::new(self.x - rhs.x, self.y - rhs.y)
     }
