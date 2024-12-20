@@ -1,6 +1,6 @@
 use std::{
     fmt::Display,
-    ops::{Add, AddAssign, Index, IndexMut},
+    ops::{Add, AddAssign, Index, IndexMut, Sub},
 };
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
@@ -12,6 +12,14 @@ pub struct Coord {
 impl Coord {
     pub fn new(x: i32, y: i32) -> Self {
         Coord { x, y }
+    }
+
+    pub fn rectilinear_distance(&self, other: &Self) -> i32 {
+        (self - other).rectilinear_norm()
+    }
+
+    pub fn rectilinear_norm(&self) -> i32 {
+        self.x.abs() + self.y.abs()
     }
 
     pub fn step_north(&self, distance: i32) -> Coord {
@@ -113,6 +121,15 @@ impl AddAssign for Coord {
         self.y += rhs.y;
     }
 }
+
+impl Sub for &Coord {
+    type Output = Coord;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Coord::new(self.x - rhs.x, self.y - rhs.y)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Grid<T> {
     pub items: Vec<T>,
