@@ -125,7 +125,7 @@ impl<T: Display> Grid<T> {
         }
     }
 
-    pub fn print_func(&self, func: fn(&T) -> &str) {
+    pub fn print_func(&self, func: fn(&T) -> String) {
         for (c, i) in self.iter() {
             print!("{}", func(i));
             if c.x == self.width as i32 - 1 {
