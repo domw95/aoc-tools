@@ -24,55 +24,67 @@ impl Coord {
         self.x.abs() + self.y.abs()
     }
 
+    #[inline]
     pub fn step_north(&self, distance: i32) -> Coord {
         Coord::new(self.x, self.y - distance)
     }
-
+    #[inline]
     pub fn step_east(&self, distance: i32) -> Coord {
         Coord::new(self.x + distance, self.y)
     }
-
+    #[inline]
     pub fn step_south(&self, distance: i32) -> Coord {
         Coord::new(self.x, self.y + distance)
     }
-
+    #[inline]
     pub fn step_west(&self, distance: i32) -> Coord {
         Coord::new(self.x - distance, self.y)
     }
 
+    #[inline]
     pub fn north(&self) -> Coord {
         Coord::new(self.x, self.y - 1)
     }
+    #[inline]
     pub fn east(&self) -> Coord {
         Coord::new(self.x + 1, self.y)
     }
+
+    #[inline]
     pub fn south(&self) -> Coord {
         Coord::new(self.x, self.y + 1)
     }
+
+    #[inline]
     pub fn west(&self) -> Coord {
         Coord::new(self.x - 1, self.y)
     }
 
+    #[inline]
     pub fn north_east(&self) -> Coord {
         Coord::new(self.x + 1, self.y - 1)
     }
 
+    #[inline]
     pub fn north_west(&self) -> Coord {
         Coord::new(self.x - 1, self.y - 1)
     }
 
+    #[inline]
     pub fn south_east(&self) -> Coord {
         Coord::new(self.x + 1, self.y + 1)
     }
 
+    #[inline]
     pub fn south_west(&self) -> Coord {
         Coord::new(self.x - 1, self.y + 1)
     }
 
+    #[inline]
     pub fn orthogs(&self) -> [Coord; 4] {
         [self.north(), self.east(), self.south(), self.west()]
     }
-
+    #[inline]
     pub fn diags(&self) -> [Coord; 4] {
         [
             self.north_east(),
@@ -81,7 +93,7 @@ impl Coord {
             self.north_west(),
         ]
     }
-
+    #[inline]
     pub fn orthog_steps(&self, distance: i32) -> [Coord; 4] {
         [
             self.step_north(distance),
@@ -90,7 +102,7 @@ impl Coord {
             self.step_west(distance),
         ]
     }
-
+    #[inline]
     pub fn step_return(&mut self, other: &Self) -> Self {
         let prev = *self;
         *self += *other;
@@ -119,6 +131,7 @@ impl Add for &Coord {
 }
 
 impl AddAssign for Coord {
+    #[inline]
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
@@ -143,12 +156,14 @@ pub struct Grid<T> {
 impl<T> Index<Coord> for Grid<T> {
     type Output = T;
 
+    #[inline]
     fn index(&self, index: Coord) -> &Self::Output {
         &self.items[self.width * index.y as usize + index.x as usize]
     }
 }
 
 impl<T> IndexMut<Coord> for Grid<T> {
+    #[inline]
     fn index_mut(&mut self, index: Coord) -> &mut Self::Output {
         &mut self.items[self.width * index.y as usize + index.x as usize]
     }
@@ -201,6 +216,7 @@ impl<T> Grid<T> {
         }
     }
 
+    #[inline]
     pub fn bounds_check(&self, coord: &Coord) -> bool {
         coord.x < self.width as i32 && coord.y < self.height as i32 && coord.x >= 0 && coord.y >= 0
     }
@@ -223,20 +239,24 @@ impl<T> Grid<T> {
         (0..self.items.len()).map(move |i| Coord::new((i % width) as i32, (i / width) as i32))
     }
 
+    #[inline]
     pub fn orthogs_coords(&self, coord: &Coord) -> [Option<(Coord, &T)>; 4] {
         coord
             .orthogs()
             .map(|c| self.checked_index(&c).map(|item| (c, item)))
     }
 
+    #[inline]
     pub fn diags(&self, coord: &Coord) -> [Option<&T>; 4] {
         coord.diags().map(|c| self.checked_index(&c))
     }
 
+    #[inline]
     pub fn diags_unchecked(&self, coord: &Coord) -> [&T; 4] {
         coord.diags().map(|c| self.index(c))
     }
 
+    #[inline]
     pub fn checked_index(&self, coord: &Coord) -> Option<&T> {
         if self.bounds_check(coord) {
             Some(&self[*coord])
