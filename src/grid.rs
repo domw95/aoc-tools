@@ -125,6 +125,15 @@ impl<T: Display> Grid<T> {
         }
     }
 
+    pub fn print_func(&self, func: fn(&T) -> &str) {
+        for (c, i) in self.iter() {
+            print!("{}", func(i));
+            if c.x == self.width as i32 - 1 {
+                println!();
+            }
+        }
+    }
+
     pub fn print_with_commas(&self) {
         for (c, i) in self.iter() {
             print!("{i}");
