@@ -14,6 +14,22 @@ impl Coord {
         Coord { x, y }
     }
 
+    pub fn step_north(&self, distance: i32) -> Coord {
+        Coord::new(self.x, self.y - distance)
+    }
+
+    pub fn step_east(&self, distance: i32) -> Coord {
+        Coord::new(self.x + distance, self.y)
+    }
+
+    pub fn step_south(&self, distance: i32) -> Coord {
+        Coord::new(self.x, self.y + distance)
+    }
+
+    pub fn step_west(&self, distance: i32) -> Coord {
+        Coord::new(self.x - distance, self.y)
+    }
+
     pub fn north(&self) -> Coord {
         Coord::new(self.x, self.y - 1)
     }
@@ -53,6 +69,15 @@ impl Coord {
             self.south_east(),
             self.south_west(),
             self.north_west(),
+        ]
+    }
+
+    pub fn orthog_steps(&self, distance: i32) -> [Coord; 4] {
+        [
+            self.step_north(distance),
+            self.step_east(distance),
+            self.step_south(distance),
+            self.step_west(distance),
         ]
     }
 
